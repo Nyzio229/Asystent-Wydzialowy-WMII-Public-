@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="WMiIApp.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:WMiIApp"
+    BackgroundColor="#1E1C26"
+    FlyoutBackgroundColor="#1E1C26"
+    Shell.ForegroundColor="#FFFFFF" 
+    TabBarBackgroundColor="#1E1C26"
+    TabBarUnselectedColor="#FFFFFF"
+    TabBarTitleColor="#0277FA">
+
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid ColumnDefinitions="0.2*,0.8*">
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor"
+                                    Value="Transparent" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Selected">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor"
+                                    Value="#3F4152" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </VisualStateManager.VisualStateGroups>
+                <Image Source="{Binding FlyoutIcon}"
+                       Margin="5"
+                       HeightRequest="35"/>
+                <Label Grid.Column="1"
+                       Text="{Binding Title}"
+                       VerticalTextAlignment="Center" 
+                       TextColor="#FFFFFF"
+                       FontSize="18"/>
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
+    <ShellContent
+        ContentTemplate="{DataTemplate local:LoadingPage}"
+        Route="LoadingPage" 
+        Shell.FlyoutBehavior="Disabled"
+        FlyoutItemIsVisible="False"/>
+    
+    <ShellContent
+        ContentTemplate="{DataTemplate local:EmailAuthPage}"
+        Route="EmailAuthPage" 
+        Shell.FlyoutBehavior="Disabled"
+        FlyoutItemIsVisible="False"/>
+    
+    <ShellContent
+        ContentTemplate="{DataTemplate local:CodeAuthPage}"
+        Route="CodeAuthPage" 
+        Shell.FlyoutBehavior="Disabled" 
+        FlyoutItemIsVisible="False"/>
+
+    <FlyoutItem Title="Czat" Icon="chat_icon.png">
+        <ShellContent
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="MainPage" />
+    </FlyoutItem>
+    <FlyoutItem Title="Mapa" Icon="map_icon.png">
+        <Tab Title="-1">
+            <ShellContent
+                ContentTemplate="{DataTemplate local:MapPage_1}"
+                Route="MapPage_1"/>
+        </Tab>
+        <Tab Title="0">
+            <ShellContent
+                ContentTemplate="{DataTemplate local:MapPage0}"
+                Route="MapPage0"/>
+        </Tab>
+        <Tab Title="1">
+            <ShellContent
+                ContentTemplate="{DataTemplate local:MapPage1}"
+                Route="MapPage1"/>
+        </Tab>
+        <Tab Title="2">
+            <ShellContent
+                ContentTemplate="{DataTemplate local:MapPage2}"
+                Route="MapPage2"/>
+        </Tab>
+    </FlyoutItem>
+    <FlyoutItem Title="Pracownicy" Icon="employees_icon.png">
+        <ShellContent
+            ContentTemplate="{DataTemplate local:EmployeesPage}"
+            Route="EmployeesPage"/>
+    </FlyoutItem>
+
+</Shell>

@@ -1,0 +1,1014 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:drawable="clr-namespace:WMiIApp.Models"
+             x:Class="WMiIApp.MapPage0"
+             Title="Parter"
+             BackgroundColor="#2F3142"
+             xmlns:local="clr-namespace:WMiIApp;assembly=WMiIApp"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             HideSoftInputOnTapped="True">
+    <ContentPage.Resources>
+        <drawable:GraphicsDrawable0 x:Key="drawable" />
+    </ContentPage.Resources>
+    <ContentPage.Behaviors>
+        <toolkit:StatusBarBehavior StatusBarColor="#1E1C26"/>
+    </ContentPage.Behaviors>
+
+    <Shell.TitleView>
+        <StackLayout Orientation="Horizontal">
+            <Label
+              Text="Parter"
+              TextColor="#FFFFFF"
+              VerticalTextAlignment="Center"
+              VerticalOptions="Center"
+              FontSize="Medium"/>
+            <AbsoluteLayout>
+                <Button 
+            Clicked="OnShowMenuButtonClicked" 
+            HeightRequest="40" 
+            WidthRequest="40" 
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutFlags="None" 
+            AbsoluteLayout.LayoutBounds="170,2,40,40"/>
+                <Image Source="map_icon.png" 
+            HeightRequest="40" 
+            WidthRequest="40" 
+            AbsoluteLayout.LayoutBounds="170,2,40,40" 
+            AbsoluteLayout.LayoutFlags="None"/>
+            </AbsoluteLayout>
+        </StackLayout>
+    </Shell.TitleView>
+    <StackLayout>
+        <Grid x:Name="menuGrid" BackgroundColor="#1E1C26" IsVisible="False">
+        <StackLayout>
+            <!--<Entry x:Name="sourceEntry" TextChanged="OnSourceEntryTextChanged" Placeholder="Filtruj src..." />-->
+            <!--<Picker x:Name="sourcePicker" Title="Żródło" SelectedIndexChanged="OnSourcePickerSelectedIndexChanged" />-->
+                <Border Stroke="#3F4152" StrokeThickness="5" Margin="5">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="20,20,20,20" />
+                    </Border.StrokeShape>
+                    <SearchBar x:Name="sourceSearchBar" Placeholder="Wybierz miejsce startowe..." TextChanged="OnSourceSearchBarTextChanged" 
+                       PlaceholderColor="#CFCFCF" TextColor="#FFFFFF" BackgroundColor="#3F4152"
+                       CancelButtonColor="#FFFFFF"/>
+                </Border>
+                <CollectionView x:Name="sourceRoomListView" SelectionMode="Single" SelectionChanged="OnSourceRoomListViewSelectionChanged"
+                            BackgroundColor="#3F4152">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout Padding="10">
+                                <Label Text="{Binding .}" TextColor="#FFFFFF"/>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup Name="CommonStates">
+                                        <VisualState Name="Normal"></VisualState>
+                                        <VisualState Name="Selected">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="#0277FA"></Setter>
+                                            </VisualState.Setters>
+                                        </VisualState>
+
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                            </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!--<Entry x:Name="destinationEntry" TextChanged="OnDestinationEntryTextChanged" Placeholder="Filtruj dest..." />-->
+            <!--<Picker x:Name="destinationPicker" Title="Cel" SelectedIndexChanged="OnDestinationPickerSelectedIndexChanged" />-->
+                <Border Stroke="#3F4152" StrokeThickness="5" Margin="5">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="20,20,20,20" />
+                    </Border.StrokeShape>
+                    <SearchBar x:Name="destinationSearchBar" Placeholder="Wybierz miejsce docelowe..." TextChanged="OnDestinationSearchBarTextChanged"
+                       PlaceholderColor="#CFCFCF" TextColor="#FFFFFF" BackgroundColor="#3F4152"
+                        CancelButtonColor="#FFFFFF"/>
+                </Border>
+                <CollectionView x:Name="destinationRoomListView" SelectionMode="Single" SelectionChanged="OnDestinationRoomListViewSelectionChanged"
+                            BackgroundColor="#3F4152">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout Padding="10">
+                                <Label Text="{Binding .}" TextColor="#FFFFFF"/>
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup Name="CommonStates">
+                                        <VisualState Name="Normal"></VisualState>
+                                        <VisualState Name="Selected">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="#0277FA"></Setter>
+                                            </VisualState.Setters>
+                                        </VisualState>
+
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                            </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+                <Button Text="Wyczyść trasę" Clicked="OnClearRouteClicked" Margin="5" CornerRadius="20" BackgroundColor="#0277FA" TextColor="#FFFFFF"/>
+                <Button Text="Wyznacz trasę" Clicked="OnCalculateRouteClicked" Margin="5" CornerRadius="20" BackgroundColor="#0277FA" TextColor="#FFFFFF"/>
+        </StackLayout>
+    </Grid>
+    
+    <local:PinchToZoomContainer>
+        <AbsoluteLayout x:Name="parterFloor">
+                
+             <!-- Mapa parteru -->
+            <AbsoluteLayout>
+                   <Image x:Name="ParterImage" 
+                       Source="parter.png" 
+                       Aspect="AspectFit" 
+                       AbsoluteLayout.LayoutBounds="0,0,300,400"
+                       AbsoluteLayout.LayoutFlags="None"/> 
+            </AbsoluteLayout>
+
+            <AbsoluteLayout>
+                    <GraphicsView Drawable="{StaticResource drawable}"
+                        AbsoluteLayout.LayoutBounds="0,0,300,400"
+                        AbsoluteLayout.LayoutFlags="None"
+                        x:Name="graphics0">
+                        <GraphicsView.GestureRecognizers>
+                            <PanGestureRecognizer PanUpdated="OnPanUpdated"/>
+                            <PinchGestureRecognizer PinchUpdated="OnPinchUpdated" />
+                        </GraphicsView.GestureRecognizers>
+                    </GraphicsView>
+                </AbsoluteLayout>
+            
+
+                <Button x:Name="ss1"                    
+            Text="SS1"
+            ClassId="ss1"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            TextColor="Transparent"
+            AbsoluteLayout.LayoutBounds="20,28,28,40"
+            AbsoluteLayout.LayoutFlags="None"
+            Clicked="HandleRoomButtonClick"
+            FontSize="8"/>
+
+            <Button x:Name="draw_ss1"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="50,62,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="pm1"
+            Text="PM1"
+            ClassId="pm1"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            TextColor="Transparent"
+            AbsoluteLayout.LayoutBounds="48,28,28,28"
+            AbsoluteLayout.LayoutFlags="None"
+            Clicked="HandleRoomButtonClick"
+            FontSize="8"/>
+
+            <Button x:Name="draw_pm1"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="55,58,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="schody"
+            Text="Schody"
+            ClassId="schody"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            TextColor="Transparent"
+            AbsoluteLayout.LayoutBounds="77,28,18,28"
+            AbsoluteLayout.LayoutFlags="None"
+            Clicked="HandleRoomButtonClickStairsOneWayUp"
+            FontSize="8"/>
+
+            <Button x:Name="draw_schody"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="85,58,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="c102"
+            Text="C102"
+            Opacity="0.5"
+            ClassId="c102"
+            BackgroundColor="Transparent"
+            TextColor="Transparent"
+            AbsoluteLayout.LayoutBounds="96,28,15,28"
+            AbsoluteLayout.LayoutFlags="None"
+            Clicked="HandleRoomButtonClick"
+            FontSize="8"/>
+
+            <Button x:Name="draw_c102"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="105,58,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="c104"
+            Text="C104"
+            Opacity="0.5"
+            ClassId="c104"
+            BackgroundColor="Transparent"
+            TextColor="Transparent"
+            AbsoluteLayout.LayoutBounds="112,28,15,28"
+            AbsoluteLayout.LayoutFlags="None"
+            Clicked="HandleRoomButtonClick"
+            FontSize="8"/>
+
+            <Button x:Name="draw_c104"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="120,58,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="c106"
+            Text="C106"
+            Opacity="0.5"
+            ClassId="c106"
+            BackgroundColor="Transparent"
+            TextColor="Transparent"
+            AbsoluteLayout.LayoutBounds="128,28,15,28"
+            AbsoluteLayout.LayoutFlags="None"
+            Clicked="HandleRoomButtonClick"
+            FontSize="8"/>
+
+            <Button x:Name="draw_c106"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="135,58,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="l13"
+             Text="L13"
+            ClassId="l13"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="160,28,30,28"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_l13"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="180,58,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="wc"
+             Text="WC"
+            ClassId="wc"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="191,28,30,28"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_wc"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="205,58,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="b111"
+             Text="B111"
+            ClassId="b111"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="20,80,28,10"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_b111"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="50,85,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="b110"
+             Text="B110"
+            ClassId="b110"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="20,91,28,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_b110"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="50,95,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="b109"
+             Text="B109"
+            ClassId="b109"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="20,100,28,9"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_b109"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="50,105,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="b108"
+             Text="B108"
+            ClassId="b108"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="20,110,28,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_b108"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="49,114,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="b107"
+            ClassId="b107"
+             Text="B107"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="20,119,28,6"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_b107"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="50,122,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="b106"
+            ClassId="b106"
+             Text="B106"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="20,126,28,6"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_b106"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="50,129,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="wc2"
+            ClassId="wc2"
+             Text="WC"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="20,133,28,6"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_wc2"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="50,135,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="schody_kolo_auli"
+            ClassId="schody_kolo_auli"
+             Text="Schody"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="20,139,24,10"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClickStairsOneWayUp"
+             FontSize="8"/>
+
+            <Button x:Name="draw_schody_kolo_auli"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="54,141,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="sala_konferencyjna"
+            ClassId="sala_konferencyjna"
+             Text="Sala konferencyjna"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="20,151,38,28"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_sala_konferencyjna"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="66,158,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="aula"
+            ClassId="aula"
+             Text="Aula"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="20,207,88,70"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_aula"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="66,200,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="b119"
+            ClassId="b119"
+             Text="B119"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="58,66,26,14"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_b119"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="55,73,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="b120"
+            ClassId="b120"
+             Text="B120"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="58,81,26,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_b120"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="55,85,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="b121"
+            ClassId="b121"
+             Text="B121"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="58,91,26,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_b121"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="55,95,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="b122"
+            ClassId="b122"
+             Text="B122"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="58,101,26,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_b122"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="55,105,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="b123"
+            ClassId="b123"
+             Text="B123"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="58,110,26,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_b123"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="55,114,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="b124"
+            ClassId="b124"
+             Text="B124"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="58,128,26,12"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_b124"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="55,134,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="patio"
+            ClassId="patio"
+             Text="Patio"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="84,72,102,66"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_patio"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="85,144,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="galeria"
+            ClassId="galeria"
+             Text="Galeria"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="186,92,18,46"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_galeria"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="187, 141,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="biblioteka"
+            ClassId="biblioteka"
+             Text="Biblioteka"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="204,110,32,28"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_biblioteka"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="205,98,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="draw_patio_wyjscie"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="207,74,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="schody3"
+            ClassId="schody3"
+             Text="Schody"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="222,54,18,36"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClickStairsOneWayUp"
+             FontSize="8"/>
+
+            <Button x:Name="draw_schody3"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="241,74,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="d107"
+            ClassId="d107"
+             Text="D107"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="256,44,24,10"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_d107"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="250,49,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="d108"
+            ClassId="d108"
+             Text="D108"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="256,54,24,10"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_d108"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="250,59,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="d109"
+            ClassId="d109"
+             Text="D109"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="256,64,24,10"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_d109"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="250,69,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="d110"
+            ClassId="d110"
+             Text="D110"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="254,84,24,16"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_d110"
+            Opacity="0.5"
+            BackgroundColor="Transparent"
+            AbsoluteLayout.LayoutBounds="250,92,3,3"
+            AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="d111"
+            ClassId="d111"
+             Text="D111"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="254,102,24,10"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_d111"
+               Opacity="0.5"
+               BackgroundColor="Transparent"
+               AbsoluteLayout.LayoutBounds="250,107,3,3"
+               AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="d112"
+            ClassId="d112"
+             Text="D112"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="254,113,24,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_d112"
+               Opacity="0.5"
+               BackgroundColor="Transparent"
+               AbsoluteLayout.LayoutBounds="250,117,3,3"
+               AbsoluteLayout.LayoutFlags="None"
+            />
+
+            <Button x:Name="d113"
+            ClassId="d113"
+             Text="D113"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="254,122,24,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_d113"
+              Opacity="0.5"
+              BackgroundColor="Transparent"
+              AbsoluteLayout.LayoutBounds="250,126,3,3"
+              AbsoluteLayout.LayoutFlags="None"
+              />
+
+            <Button x:Name="d114"
+            ClassId="d114"
+             Text="D114"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="254,131,24,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_d114"
+              Opacity="0.5"
+              BackgroundColor="Transparent"
+              AbsoluteLayout.LayoutBounds="250,135,3,3"
+              AbsoluteLayout.LayoutFlags="None"
+              />
+
+            <Button x:Name="schody_parter_piwnica_parter"
+            ClassId="schody_parter_piwnica_parter"
+             Text="Schody Parter Piwnica Kolo Patio"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="132,142,34,14"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClickStairsOneWayDown"
+             FontSize="8"/>
+
+            <Button x:Name="draw_schody_parter_piwnica"
+              Opacity="0.5"
+              BackgroundColor="Transparent"
+              AbsoluteLayout.LayoutBounds="165, 149,3,3"
+              AbsoluteLayout.LayoutFlags="None"
+              />
+
+            <Button x:Name="schody_parter_kolo_wejscia_parter"
+             ClassId="schody_parter_kolo_wejscia_parter"
+             Text="Schody Parter Lesk"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="186,176,34,14"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClickStairsTwoWay"
+             FontSize="8"/>
+
+            <Button x:Name="draw_schody_parter_kolo_wejscia"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="215,184,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="wejscie"
+             ClassId="wejscie"
+             Text="Wejście"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="254,149,18,28"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_wejscie"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="250,163,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="portiernia"
+             ClassId="portiernia"
+             Text="Portiernia"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="254,178,18,10"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_portiernia"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="250,183,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="s1"
+             ClassId="s1"
+             Text="S1"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="254,188,22,10"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_s1"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="250,193,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="s2"
+             ClassId="s2"
+             Text="S2"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="254,199,22,22"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_s2"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="250,210,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="s3"
+             ClassId="s3"
+             Text="S3"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="254,222,22,14"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_s3"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="250,229,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="wc3"
+             ClassId="wc3"
+             Text="WC"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="254,237,22,20"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_wc3"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="250,247,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="e111"
+             ClassId="e111"
+             Text="E111"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="222,206,16,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_e111"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="239,210,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="e109"
+             ClassId="e109"
+             Text="E109"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="222,214,16,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_e109"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="239,218,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="e107"
+             ClassId="e107"
+             Text="E107"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="222,222,16,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_e107"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="239,226,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+            <Button x:Name="e106"
+             ClassId="e106"
+             Text="E106"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             TextColor="Transparent"
+             AbsoluteLayout.LayoutBounds="222,230,16,8"
+             AbsoluteLayout.LayoutFlags="None"
+             Clicked="HandleRoomButtonClick"
+             FontSize="8"/>
+
+            <Button x:Name="draw_e106"
+             Opacity="0.5"
+             BackgroundColor="Transparent"
+             AbsoluteLayout.LayoutBounds="239,233,3,3"
+             AbsoluteLayout.LayoutFlags="None"
+             />
+
+        </AbsoluteLayout>
+    </local:PinchToZoomContainer>
+    </StackLayout>
+
+</ContentPage>
